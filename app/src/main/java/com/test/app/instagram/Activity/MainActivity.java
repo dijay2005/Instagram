@@ -62,7 +62,13 @@ public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFee
     }
 
     private void setupFeed() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this){
+            @Override
+            protected int getExtraLayoutSpace(RecyclerView.State state)
+            {
+                return 300;
+            }
+        };
         rvFeed.setLayoutManager(linearLayoutManager);
         feedAdapter = new FeedAdapter(this);
         rvFeed.setAdapter(feedAdapter);
@@ -78,12 +84,12 @@ public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFee
         if (pendingIntroAnimation)
         {
             pendingIntroAnimation = false;
-            startInstroAnimation();
+            startIntroAnimation();
         }
         return true;
     }
 
-    private void startInstroAnimation()
+    private void startIntroAnimation()
     {
         btnCreate.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
 

@@ -7,16 +7,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.test.app.instagram.Adapter.CommentsAdapter;
 import com.test.app.instagram.R;
+import com.test.app.instagram.SendCommentButton;
 import com.test.app.instagram.Utils;
 
 import butterknife.InjectView;
@@ -27,7 +29,8 @@ import butterknife.InjectView;
  * Name：Instagram
  * Description：
  */
-public class CommentsActivity extends ActionBarActivity
+public class CommentsActivity extends ActionBarActivity implements SendCommentButton
+        .OnSendClickListener
 {
     public static final String ARG_DRAWING_START_LOCATION = "arg_drawing_start_location";
 
@@ -41,7 +44,7 @@ public class CommentsActivity extends ActionBarActivity
     LinearLayout llAddComment;
 
     @InjectView(R.id.btnSendComment)
-    Button btnSendComment;
+    SendCommentButton btnSendComment;
     @InjectView(R.id.etComment)
     EditText etComment;
 
@@ -77,7 +80,13 @@ public class CommentsActivity extends ActionBarActivity
     }
 
     private void setupComments() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this){
+            @Override
+            protected int getExtraLayoutSpace(RecyclerView.State state)
+            {
+                return 300;
+            }
+        };
         rvComments.setLayoutManager(linearLayoutManager);
         rvComments.setHasFixedSize(true);
 
@@ -94,11 +103,13 @@ public class CommentsActivity extends ActionBarActivity
         });
     }
     private void setupSendCommentButton() {
-//        btnSendComment.setOnSendClickListener(this);
+        btnSendComment.setOnSendClickListener(this);
     }
 
     private void startIntroAnimation()
     {
+//        ViewCompat.setElevation(getToolbar(),0);
+
         contentRoot.setScaleY(0.1f);
         contentRoot.setPivotY(drawStarLocation);
         llAddComment.setTranslationY(100);
@@ -109,12 +120,12 @@ public class CommentsActivity extends ActionBarActivity
             @Override
             public void onAnimationEnd(Animator animation)
             {
-                animateCount();
+                animateContent();
             }
         }).start();
     }
 
-    private void animateCount()
+    private void animateContent()
     {
         commentsAdapter.updateItems();
         llAddComment.animate().translationY(0).setInterpolator(new DecelerateInterpolator())
@@ -123,6 +134,7 @@ public class CommentsActivity extends ActionBarActivity
     }
     @Override
     public void onBackPressed() {
+//        ViewCompat.setElevation(getToolbar(), 0);
         contentRoot.animate()
                 .translationY(Utils.getScreenHeight(this))
                 .setDuration(200)
@@ -134,6 +146,31 @@ public class CommentsActivity extends ActionBarActivity
                     }
                 })
                 .start();
+    }
+
+    @Override
+    public void OnSendClickListener(View v)
+    {
+        if (validateComment()) {
+            commentsAdapter.addItem();
+            commentsAdapter.setAnimationsLocked(false);
+            commentsAdapter.setDelayEnterAnimation(false);
+            rvComments.smoothScrollBy(0, rvComments.getChildAt(0).getHeight() * commentsAdapter.getItemCount());
+
+            etComment.setText(null);
+            btnSendComment.setCurrentState(SendCommentButton.STATE_DONE);
+        }
+
+    }
+
+
+    private boolean validateComment() {
+        if (TextUtils.isEmpty(etComment.getText())) {
+            btnSendComment.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_error));
+            return false;
+        }
+
+        return true;
     }
 
 }
