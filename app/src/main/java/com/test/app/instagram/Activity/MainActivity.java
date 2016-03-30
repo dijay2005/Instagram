@@ -130,4 +130,10 @@ public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFee
         startActivity(intent);
         overridePendingTransition(0, 0);
     }
+
+    @Override
+    public void onMoreClick(View v, int position)
+    {
+
+    }
 }

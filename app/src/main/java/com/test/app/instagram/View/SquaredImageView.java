@@ -1,4 +1,4 @@
-package com.test.app.instagram;
+package com.test.app.instagram.View;
 
 import android.annotation.TargetApi;
 import android.content.Context;

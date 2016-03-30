@@ -7,23 +7,9 @@
                 android:layout_height="match_parent"
                 tools:context=".Activity.MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/tools"
+    <include
         android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:scaleType="center"
-            android:src="@drawable/img_toolbar_logo" />
-    </android.support.v7.widget.Toolbar>
+        layout="@layout/view_feed_toolbar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvFeed"

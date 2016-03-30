@@ -3,11 +3,14 @@ package com.test.app.instagram.Activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
@@ -18,9 +21,10 @@ import android.widget.LinearLayout;
 
 import com.test.app.instagram.Adapter.CommentsAdapter;
 import com.test.app.instagram.R;
-import com.test.app.instagram.SendCommentButton;
 import com.test.app.instagram.Utils;
+import com.test.app.instagram.View.SendCommentButton;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
@@ -56,7 +60,9 @@ public class CommentsActivity extends ActionBarActivity implements SendCommentBu
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
+        ButterKnife.inject(this);
 
+        setupToolbar();
         setupComments();
         setupSendCommentButton();
 
@@ -77,6 +83,12 @@ public class CommentsActivity extends ActionBarActivity implements SendCommentBu
 
         }
 
+    }
+
+    private void setupToolbar()
+    {
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white);
     }
 
     private void setupComments() {
@@ -108,13 +120,13 @@ public class CommentsActivity extends ActionBarActivity implements SendCommentBu
 
     private void startIntroAnimation()
     {
-//        ViewCompat.setElevation(getToolbar(),0);
+        ViewCompat.setElevation(toolbar,0);
 
         contentRoot.setScaleY(0.1f);
         contentRoot.setPivotY(drawStarLocation);
-        llAddComment.setTranslationY(100);
+        llAddComment.setTranslationY(200);
 
-        contentRoot.animate().scaleY(1).setDuration(100).setInterpolator(new
+        contentRoot.animate().scaleY(1).setDuration(200).setInterpolator(new
                 AccelerateInterpolator()).setListener(new AnimatorListenerAdapter()
         {
             @Override
@@ -132,9 +144,18 @@ public class CommentsActivity extends ActionBarActivity implements SendCommentBu
                 .setDuration(200).start();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem inboxMenuItem = menu.findItem(R.id.action_inbox);
+        inboxMenuItem.setActionView(R.layout.menu_item_view);
+        return true;
+    }
+
     @Override
     public void onBackPressed() {
-//        ViewCompat.setElevation(getToolbar(), 0);
+        ViewCompat.setElevation(toolbar, 0);
         contentRoot.animate()
                 .translationY(Utils.getScreenHeight(this))
                 .setDuration(200)

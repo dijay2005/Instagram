@@ -1,10 +1,12 @@
-package com.test.app.instagram;
+package com.test.app.instagram.View;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ViewAnimator;
+
+import com.test.app.instagram.R;
 
 /**
  * Author：DJ
