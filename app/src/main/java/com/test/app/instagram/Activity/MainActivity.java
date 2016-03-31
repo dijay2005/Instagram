@@ -18,11 +18,14 @@ import android.widget.ImageView;
 import com.test.app.instagram.Adapter.FeedAdapter;
 import com.test.app.instagram.R;
 import com.test.app.instagram.Utils;
+import com.test.app.instagram.View.FeedContextMenu;
+import com.test.app.instagram.View.FeedContextMenuManager;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFeedItemClickListener
+public class MainActivity extends ActionBarActivity implements FeedAdapter
+        .OnFeedItemClickListener,FeedContextMenu.OnFeedContextMenuItemClickListener
 {
     private static final int ANIM_DURATION_TOOLBAR = 300;
     private static final int ANIM_DURATION_FAB = 400;
@@ -72,8 +75,18 @@ public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFee
         rvFeed.setLayoutManager(linearLayoutManager);
         feedAdapter = new FeedAdapter(this);
         rvFeed.setAdapter(feedAdapter);
-
         feedAdapter.setOnFeedItemClickListener(this);
+
+        rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                FeedContextMenuManager.getInstance().onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+
     }
 
     @Override
@@ -132,8 +145,32 @@ public class MainActivity extends ActionBarActivity implements FeedAdapter.OnFee
     }
 
     @Override
-    public void onMoreClick(View v, int position)
+    public void onMoreClick(View v, int itemPosition)
     {
+        FeedContextMenuManager.getInstance().toggleContextMenuFromView(v,itemPosition,this);
+    }
 
+    @Override
+    public void onReportClick(int feedItem)
+    {
+        FeedContextMenuManager.getInstance().hideContextView();
+    }
+
+    @Override
+    public void onSharePhotoClick(int feedItem)
+    {
+        FeedContextMenuManager.getInstance().hideContextView();
+    }
+
+    @Override
+    public void onCopyShareUrlClick(int feedItem)
+    {
+        FeedContextMenuManager.getInstance().hideContextView();
+    }
+
+    @Override
+    public void onCancelClick(int feedItem)
+    {
+        FeedContextMenuManager.getInstance().hideContextView();
     }
 }

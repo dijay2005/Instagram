@@ -106,11 +106,11 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             if (onFeedItemClickListener != null)
             {
                 onFeedItemClickListener.onCommentsClick(v, (Integer) v.getTag());
-            } else if (viewId==R.id.btnMore)
-            {
-                if (onFeedItemClickListener!=null)
-                    onFeedItemClickListener.onMoreClick(v, (Integer) v.getTag());
             }
+        }else if (viewId==R.id.btnMore)
+        {
+            if (onFeedItemClickListener!=null)
+                onFeedItemClickListener.onMoreClick(v, (Integer) v.getTag());
         }
     }
 
@@ -125,7 +125,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     }
 
     public interface OnFeedItemClickListener {
-        public void onCommentsClick(View v, int position);
+        public void onCommentsClick(View v, int itemPosition);
 
         public void onMoreClick(View v, int position);
     }
