@@ -49,6 +49,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private int lastAnimatedPosition = -1;
     private int itemsCount = 0;
 
+    private boolean animateItems = false;
+
     private final Map<Integer, Integer> likesCount = new HashMap<>();
     private final Map<RecyclerView.ViewHolder, AnimatorSet> likeAnimations = new HashMap<>();
     private final ArrayList<Integer> likedPositions = new ArrayList<>();
@@ -65,12 +67,20 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         final View view = LayoutInflater.from(context).inflate(R.layout.item_feed, parent, false);
-        return new CellFeedViewHolder(view);
+
+        final CellFeedViewHolder cellFeedViewHolder = new CellFeedViewHolder(view);
+        cellFeedViewHolder.btnComment.setOnClickListener(this);
+        cellFeedViewHolder.btnMore.setOnClickListener(this);
+        cellFeedViewHolder.ivFeedCenter.setOnClickListener(this);
+        cellFeedViewHolder.btnLike.setOnClickListener(this);
+        cellFeedViewHolder.ivUserProfile.setOnClickListener(this);
+
+        return cellFeedViewHolder;
     }
 
     private void runEnterAnimation(View view, int position)
     {
-        if (position >= ANIMATED_ITEMS_COUNT - 1)
+        if (animateItems||position >= ANIMATED_ITEMS_COUNT - 1)
         {
             return;
         }
@@ -104,13 +114,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         updateLikeCounter(holder, false);
         updateHeartButton(holder, false);
 
-        holder.btnComment.setOnClickListener(this);
+
         holder.btnComment.setTag(position);
-        holder.btnMore.setOnClickListener(this);
         holder.btnMore.setTag(position);
-        holder.btnLike.setOnClickListener(this);
         holder.btnLike.setTag(holder);
-        holder.ivFeedCenter.setOnClickListener(this);
         holder.ivFeedCenter.setTag(holder);
 
         if (likeAnimations.containsKey(holder))
@@ -289,6 +296,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         @InjectView(R.id.tsLikesCounter)
         TextSwitcher tsLikesCounter;
 
+        @InjectView(R.id.ivUserProfile)
+        ImageView ivUserProfile;
+
+
         public CellFeedViewHolder(View view)
         {
             super(view);
@@ -332,6 +343,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 updateHeartButton(holder, false);
             }
 
+        } else if (viewId == R.id.ivUserProfile)
+        {
+            if (onFeedItemClickListener != null)
+            {
+                onFeedItemClickListener.onProfileClick(view);
+            }
         }
     }
 
@@ -342,9 +359,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         holder.ivLike.setVisibility(View.GONE);
     }
 
-    public void updateItems()
+    public void updateItems(boolean animated)
     {
         itemsCount = 10;
+        animateItems = animated;
         fillLikeWithRandomValues();
         notifyDataSetChanged();
     }
@@ -368,5 +386,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         public void onCommentsClick(View v, int itemPosition);
 
         public void onMoreClick(View v, int position);
+
+        public void onProfileClick(View v);
     }
 }
