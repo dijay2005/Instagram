@@ -80,7 +80,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     private void runEnterAnimation(View view, int position)
     {
-        if (animateItems||position >= ANIMATED_ITEMS_COUNT - 1)
+        if (!animateItems||position >= ANIMATED_ITEMS_COUNT - 1)
         {
             return;
         }
@@ -208,103 +208,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             }
         }
 
-
-    }
-
-    private void animatePhotoLike(final CellFeedViewHolder holder)
-    {
-        if (!likeAnimations.containsKey(holder))
-        {
-            holder.vBglike.setVisibility(View.VISIBLE);
-            holder.ivLike.setVisibility(View.VISIBLE);
-
-            holder.vBglike.setScaleY(0.1f);
-            holder.vBglike.setScaleX(0.1f);
-            holder.vBglike.setAlpha(1f);
-            holder.ivLike.setScaleY(0.1f);
-            holder.ivLike.setScaleX(0.1f);
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            likeAnimations.put(holder, animatorSet);
-
-            ObjectAnimator bgScaleYAnim = ObjectAnimator.ofFloat(holder.vBglike, "scaleY", 0.1f,
-                    1f);
-            bgScaleYAnim.setDuration(200);
-            bgScaleYAnim.setInterpolator(DECELERATE_INTERPOLATOR);
-            ObjectAnimator bgScaleXAnim = ObjectAnimator.ofFloat(holder.vBglike, "scaleX", 0.1f,
-                    1f);
-            bgScaleXAnim.setDuration(200);
-            bgScaleXAnim.setInterpolator(DECELERATE_INTERPOLATOR);
-            ObjectAnimator bgAlphaAnim = ObjectAnimator.ofFloat(holder.vBglike, "alpha", 1f, 0f);
-            bgAlphaAnim.setDuration(200);
-            bgAlphaAnim.setStartDelay(150);
-            bgAlphaAnim.setInterpolator(DECELERATE_INTERPOLATOR);
-
-            ObjectAnimator imgScaleUpYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 0.1f, 1f);
-            imgScaleUpYAnim.setDuration(300);
-            imgScaleUpYAnim.setInterpolator(DECELERATE_INTERPOLATOR);
-            ObjectAnimator imgScaleUpXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 0.1f, 1f);
-            imgScaleUpXAnim.setDuration(300);
-            imgScaleUpXAnim.setInterpolator(DECELERATE_INTERPOLATOR);
-
-            ObjectAnimator imgScaleDownYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 1f,
-                    0.1f);
-            imgScaleDownYAnim.setDuration(300);
-            imgScaleDownYAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
-            ObjectAnimator imgScaleDownXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 1f,
-                    0.1f);
-            imgScaleDownXAnim.setDuration(300);
-            imgScaleDownXAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
-
-            animatorSet.playTogether(bgScaleYAnim, bgScaleXAnim, bgAlphaAnim, imgScaleUpYAnim,
-                    imgScaleUpXAnim);
-            animatorSet.play(imgScaleDownXAnim).with(imgScaleDownYAnim).after(imgScaleUpYAnim);
-
-            animatorSet.addListener(new AnimatorListenerAdapter()
-            {
-                @Override
-                public void onAnimationEnd(Animator animation)
-                {
-                    resetLikeAnimationState(holder);
-                }
-            });
-
-            animatorSet.start();
-
-        }
-    }
-
-    public static class CellFeedViewHolder extends RecyclerView.ViewHolder
-    {
-        @InjectView(R.id.ivFeedCenter)
-        ImageView ivFeedCenter;
-        @InjectView(R.id.ivFeedBottom)
-        ImageView ivFeedBottom;
-
-        @InjectView(R.id.btnLike)
-        ImageButton btnLike;
-        @InjectView(R.id.btnComment)
-        ImageButton btnComment;
-        @InjectView(R.id.btnMore)
-        ImageButton btnMore;
-
-        @InjectView(R.id.vBglike)
-        View vBglike;
-        @InjectView(R.id.ivLike)
-        ImageView ivLike;
-
-        @InjectView(R.id.tsLikesCounter)
-        TextSwitcher tsLikesCounter;
-
-        @InjectView(R.id.ivUserProfile)
-        ImageView ivUserProfile;
-
-
-        public CellFeedViewHolder(View view)
-        {
-            super(view);
-            ButterKnife.inject(this, view);
-        }
     }
 
     @Override
@@ -352,12 +255,111 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         }
     }
 
+    private void animatePhotoLike(final CellFeedViewHolder holder)
+    {
+        if (!likeAnimations.containsKey(holder))
+        {
+            holder.vBglike.setVisibility(View.VISIBLE);
+            holder.ivLike.setVisibility(View.VISIBLE);
+
+            holder.vBglike.setScaleY(0.1f);
+            holder.vBglike.setScaleX(0.1f);
+            holder.vBglike.setAlpha(1f);
+            holder.ivLike.setScaleY(0.1f);
+            holder.ivLike.setScaleX(0.1f);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            likeAnimations.put(holder, animatorSet);
+
+            ObjectAnimator bgScaleYAnim = ObjectAnimator.ofFloat(holder.vBglike, "scaleY", 0.1f,
+                    1f);
+            bgScaleYAnim.setDuration(200);
+            bgScaleYAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+            ObjectAnimator bgScaleXAnim = ObjectAnimator.ofFloat(holder.vBglike, "scaleX", 0.1f,
+                    1f);
+            bgScaleXAnim.setDuration(200);
+            bgScaleXAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+            ObjectAnimator bgAlphaAnim = ObjectAnimator.ofFloat(holder.vBglike, "alpha", 1f, 0f);
+            bgAlphaAnim.setDuration(200);
+            bgAlphaAnim.setStartDelay(150);
+            bgAlphaAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleUpYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 0.1f, 1f);
+            imgScaleUpYAnim.setDuration(300);
+            imgScaleUpYAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleUpXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 0.1f, 1f);
+            imgScaleUpXAnim.setDuration(300);
+            imgScaleUpXAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleDownYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 1f,
+                    0f);
+            imgScaleDownYAnim.setDuration(300);
+            imgScaleDownYAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleDownXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 1f,
+                    0f);
+            imgScaleDownXAnim.setDuration(300);
+            imgScaleDownXAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+
+            animatorSet.playTogether(bgScaleYAnim, bgScaleXAnim, bgAlphaAnim, imgScaleUpYAnim,
+                    imgScaleUpXAnim);
+            animatorSet.play(imgScaleDownXAnim).with(imgScaleDownYAnim).after(imgScaleUpYAnim);
+
+            animatorSet.addListener(new AnimatorListenerAdapter()
+            {
+                @Override
+                public void onAnimationEnd(Animator animation)
+                {
+                    resetLikeAnimationState(holder);
+                }
+            });
+
+            animatorSet.start();
+
+        }
+    }
+
     private void resetLikeAnimationState(CellFeedViewHolder holder)
     {
         likeAnimations.remove(holder);
         holder.vBglike.setVisibility(View.GONE);
         holder.ivLike.setVisibility(View.GONE);
     }
+
+    public static class CellFeedViewHolder extends RecyclerView.ViewHolder
+    {
+        @InjectView(R.id.ivFeedCenter)
+        ImageView ivFeedCenter;
+        @InjectView(R.id.ivFeedBottom)
+        ImageView ivFeedBottom;
+
+        @InjectView(R.id.btnLike)
+        ImageButton btnLike;
+        @InjectView(R.id.btnComment)
+        ImageButton btnComment;
+        @InjectView(R.id.btnMore)
+        ImageButton btnMore;
+
+        @InjectView(R.id.vBglike)
+        View vBglike;
+        @InjectView(R.id.ivLike)
+        ImageView ivLike;
+
+        @InjectView(R.id.tsLikesCounter)
+        TextSwitcher tsLikesCounter;
+
+        @InjectView(R.id.ivUserProfile)
+        ImageView ivUserProfile;
+
+
+        public CellFeedViewHolder(View view)
+        {
+            super(view);
+            ButterKnife.inject(this, view);
+        }
+    }
+
+
+
 
     public void updateItems(boolean animated)
     {

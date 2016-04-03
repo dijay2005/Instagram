@@ -26,15 +26,18 @@ public class BaseActivity extends ActionBarActivity
 
     private MenuItem inboxMenuItem;
 
+
     @Override
     public void setContentView(int layoutResID)
     {
         super.setContentView(layoutResID);
         ButterKnife.inject(this);
-        setToolbar();
-    }
+        setupToolbar();
+  }
 
-    protected void setToolbar()
+
+
+    protected void setupToolbar()
     {
         if (toolbar != null)
         {
@@ -42,6 +45,7 @@ public class BaseActivity extends ActionBarActivity
             toolbar.setNavigationIcon(R.drawable.ic_menu_white);
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -66,4 +70,6 @@ public class BaseActivity extends ActionBarActivity
     {
         return ivLogo;
     }
+
+
 }

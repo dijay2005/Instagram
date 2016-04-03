@@ -62,8 +62,8 @@ public class MainActivity extends BaseActivity implements FeedAdapter
         rvFeed.setLayoutManager(linearLayoutManager);
 
         feedAdapter = new FeedAdapter(this);
-        rvFeed.setAdapter(feedAdapter);
         feedAdapter.setOnFeedItemClickListener(this);
+        rvFeed.setAdapter(feedAdapter);
 
         rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener()
         {

@@ -59,7 +59,6 @@ public class UserProfileActivity extends BaseActivity implements RevealBackgroun
             public void onScrollStateChanged(RecyclerView recyclerView, int newState)
             {
                 userPhotosAdapter.setLockedAnimations(true);
-//                vRevealBackground.setToFinishedState();// TODO: 2016/4/2 0002
             }
         });
     }

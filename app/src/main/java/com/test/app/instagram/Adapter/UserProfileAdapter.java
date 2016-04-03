@@ -111,7 +111,6 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             final View view = LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false);
             StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager
                     .LayoutParams) view.getLayoutParams();
-            layoutParams.setFullSpan(false);
             layoutParams.width = cellSize;
             layoutParams.height = cellSize;
             layoutParams.setFullSpan(false);

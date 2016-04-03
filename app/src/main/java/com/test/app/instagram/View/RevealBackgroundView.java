@@ -137,6 +137,11 @@ public class RevealBackgroundView extends View
         invalidate();
     }
 
+    public void setFillPaint(int color)
+    {
+        fillPaint.setColor(color);
+    }
+
     public interface OnStateChangeListener
     {
         void onStateChange(int state);
