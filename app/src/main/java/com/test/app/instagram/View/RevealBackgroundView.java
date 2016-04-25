@@ -108,7 +108,7 @@ public class RevealBackgroundView extends View
         }
     }
 
-    public void setToFinishedState()
+    public void setToFinishedFrame()
     {
         changeState(STATE_FINISH);
         invalidate();
@@ -137,7 +137,7 @@ public class RevealBackgroundView extends View
         invalidate();
     }
 
-    public void setFillPaint(int color)
+    public void setFillPaintColor(int color)
     {
         fillPaint.setColor(color);
     }

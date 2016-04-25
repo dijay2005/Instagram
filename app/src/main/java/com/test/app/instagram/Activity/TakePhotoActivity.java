@@ -1,22 +1,38 @@
 package com.test.app.instagram.Activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Camera;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ViewSwitcher;
 
 import com.commonsware.cwac.camera.CameraHost;
+import com.commonsware.cwac.camera.CameraHostProvider;
 import com.commonsware.cwac.camera.CameraView;
+import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
+import com.test.app.instagram.Adapter.PhotoFiltersAdapter;
 import com.test.app.instagram.R;
 import com.test.app.instagram.View.RevealBackgroundView;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Author：DJ
@@ -24,12 +40,26 @@ import butterknife.InjectView;
  * Name：Instagram
  * Description：
  */
-public class TakePhotoActivity extends BaseActivity implements RevealBackgroundView.OnStateChangeListener
+public class TakePhotoActivity extends BaseActivity implements RevealBackgroundView
+        .OnStateChangeListener,CameraHostProvider
 {
+    public static final String ARG_REVEAL_START_LOCATION = "reveal_start_location";
 
-    private final static Interpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator ();
-    private final static Interpolator DECELERATE_INTERPOLATOR = new DecelerateInterpolator ();
+    private static final  Interpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator ();
+    private static final  Interpolator DECELERATE_INTERPOLATOR = new DecelerateInterpolator ();
 
+    private static final int STATE_TAKE_PHOTO = 0;
+    private static final int STATE_SETUP_PHOTO = 1;
+
+
+    @InjectView(R.id.vRevealBackground)
+    RevealBackgroundView vRevealBackground;
+    @InjectView(R.id.vPhotoRoot)
+    View vPhotoRoot;
+    @InjectView(R.id.vShutter)
+    View vShutter;
+    @InjectView(R.id.ivTakenPhoto)
+    ImageView ivTakenPhoto;
     @InjectView(R.id.vUpperPanel)
     ViewSwitcher vUpperPanel;
     @InjectView(R.id.vLowerPanel)
@@ -38,11 +68,29 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
     View vTakePhotoRoot;
     @InjectView(R.id.cameraView)
     CameraView cameraView;
+    @InjectView(R.id.rvFilters)
+    RecyclerView rvFilters;
+    @InjectView(R.id.btnTakePhoto)
+    Button btnTakePhoto;
+
+    private boolean pendingIntro;
+    private int currentState;
+
+    public static void startCameraFromLocation(int[] startingLocation, Activity startingActivity)
+    {
+        Intent intent = new Intent(startingActivity, TakePhotoActivity.this);
+        intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
+        startingActivity.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate (savedInstanceState);
+        setContentView(R.layout.activity_take_photo);
+        updateState(STATE_TAKE_PHOTO);
+        setupRevealBackground(savedInstanceState);
+        setupPhotoFilters();
 
         vUpperPanel.getViewTreeObserver ().addOnPreDrawListener (new ViewTreeObserver.OnPreDrawListener ()
         {
@@ -50,12 +98,98 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
             public boolean onPreDraw()
             {
                 vUpperPanel.getViewTreeObserver ().removeOnPreDrawListener (this);
+                pendingIntro = true;
                 vUpperPanel.setTranslationY (-vUpperPanel.getHeight ());
                 vLowerPanel.setTranslationY (vLowerPanel.getHeight ());
                 return true;
             }
         });
     }
+
+    private void setupRevealBackground(Bundle savedInstanceState)
+    {
+        vRevealBackground.setFillPaintColor(0xFF16181a);
+        vRevealBackground.setOnStateChangeListener(this);
+
+        if (savedInstanceState == null)
+        {
+            final int[] startingLocation = getIntent().getIntArrayExtra(ARG_REVEAL_START_LOCATION);
+            vRevealBackground.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener()
+
+            {
+                @Override
+                public boolean onPreDraw()
+                {
+                    vRevealBackground.getViewTreeObserver().removeOnPreDrawListener(this);
+                    vRevealBackground.startFromLocation(startingLocation);
+                    return true;
+                }
+            });
+        }else
+        {
+            vRevealBackground.setToFinishedFrame();
+        }
+    }
+
+    private void setupPhotoFilters()
+    {
+        PhotoFiltersAdapter photoFiltersAdapter = new PhotoFiltersAdapter(this);
+        rvFilters.setHasFixedSize(true);
+        rvFilters.setAdapter(photoFiltersAdapter);
+        rvFilters.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,
+                false));
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume ();
+        cameraView.onResume ();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause ();
+        cameraView.onPause ();
+    }
+
+    @OnClick(R.id.btnTakePhoto)
+    public void onTakePhotoCilck()
+    {
+        btnTakePhoto.setEnabled(false);
+        cameraView.takePicture(true,false);
+        animateShutter();
+    }
+
+    private void animateShutter()
+    {
+        vShutter.setVisibility(View.VISIBLE);
+        vShutter.setAlpha(0.f);
+
+        ObjectAnimator alphaInAnim = ObjectAnimator.ofFloat(vShutter, "alpha", 0f, 0.8f);
+        alphaInAnim.setDuration(100);
+        alphaInAnim.setStartDelay(100);
+        alphaInAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+
+        ObjectAnimator alphaOutAnim = ObjectAnimator.ofFloat(vShutter, "alpha", 0.8f, 0f);
+        alphaOutAnim.setDuration(100);
+        alphaOutAnim.setInterpolator(DECELERATE_INTERPOLATOR);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playSequentially(alphaInAnim, alphaOutAnim);
+        animatorSet.addListener(new AnimatorListenerAdapter()
+        {
+            @Override
+            public void onAnimationEnd(Animator animation)
+            {
+                vShutter.setVisibility(View.GONE);
+            }
+        });
+
+        animatorSet.start();
+    }
+
 
     @Override
     public void onStateChange(int state)
@@ -76,18 +210,11 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
         vLowerPanel.animate ().translationX (0).setDuration (400).setInterpolator (DECELERATE_INTERPOLATOR).start ();
     }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume ();
-        cameraView.onResume ();
-    }
 
     @Override
-    protected void onPause()
+    public CameraHost getCameraHost()
     {
-        super.onPause ();
-        cameraView.onPause ();
+        return new MyCameraHost(this);
     }
 
 
@@ -100,5 +227,91 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
         {
             super (ctxt);
         }
+
+        @Override
+        public boolean useFullBleedPreview()
+        {
+            return true;
+        }
+
+        @Override
+        public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters)
+        {
+            return previewSize;
+        }
+
+        @Override
+        public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters)
+        {
+            Camera.Parameters parameters1 = super.adjustPreviewParameters(parameters);
+            previewSize = parameters1.getPreviewSize();
+            return parameters1;
+        }
+
+        @Override
+        public void saveImage(PictureTransaction xact, final Bitmap bitmap)
+        {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    showTakenPicture(bitmap);
+                }
+            });
+        }
     }
+
+    private void showTakenPicture(Bitmap bitmap)
+    {
+        vUpperPanel.showNext();
+        vLowerPanel.showNext();
+        ivTakenPhoto.setImageBitmap(bitmap);
+        updateState(STATE_SETUP_PHOTO);
+    }
+
+
+    @Override
+    public void onBackPressed()
+    {
+        if (currentState == STATE_SETUP_PHOTO)
+        {
+            btnTakePhoto.setEnabled(true);
+            vUpperPanel.showNext();
+            vLowerPanel.showNext();
+            updateState(STATE_TAKE_PHOTO);
+        }else
+        {
+            super.onBackPressed();
+        }
+    }
+
+    private void updateState(int state)
+    {
+        currentState = state;
+        if (currentState == STATE_TAKE_PHOTO)
+        {
+            vUpperPanel.setInAnimation(this,R.anim.slide_in_from_right);
+            vLowerPanel.setInAnimation(this, R.anim.slide_in_from_right);
+            vUpperPanel.setOutAnimation(this,R.anim.slide_out_to_left);
+            vLowerPanel.setOutAnimation(this, R.anim.slide_out_to_left);
+            new Handler().postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    ivTakenPhoto.setVisibility(View.GONE);
+                }
+            },400);
+        } else if (currentState == STATE_SETUP_PHOTO)
+        {
+            vUpperPanel.setInAnimation(this,R.anim.slide_in_from_left);
+            vLowerPanel.setInAnimation(this, R.anim.slide_in_from_left);
+            vUpperPanel.setOutAnimation(this,R.anim.slide_out_to_right);
+            vLowerPanel.setOutAnimation(this, R.anim.slide_out_to_right);
+            ivTakenPhoto.setVisibility(View.VISIBLE);
+        }
+
+    }
+
 }

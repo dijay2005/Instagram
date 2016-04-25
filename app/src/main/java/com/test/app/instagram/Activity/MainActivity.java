@@ -18,6 +18,7 @@ import com.test.app.instagram.View.FeedContextMenu;
 import com.test.app.instagram.View.FeedContextMenuManager;
 
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity implements FeedAdapter
         .OnFeedItemClickListener,FeedContextMenu.OnFeedContextMenuItemClickListener
@@ -168,5 +169,15 @@ public class MainActivity extends BaseActivity implements FeedAdapter
         startingLocation[0] += v.getWidth() / 2;
         UserProfileActivity.startUserProfileFromLocation(startingLocation, this);
         overridePendingTransition(0,0);
+    }
+
+    @OnClick(R.id.btnCreate)
+    public void onTakePhotoClick()
+    {
+        int[] startingLocation = new int[2];
+        btnCreate.getLocationOnScreen(startingLocation);
+        startingLocation[0] += btnCreate.getWidth() / 2;
+        TakePhotoActivity.startCameraFromLocation(startingLocation, this);
+        overridePendingTransition(0, 0);
     }
 }
