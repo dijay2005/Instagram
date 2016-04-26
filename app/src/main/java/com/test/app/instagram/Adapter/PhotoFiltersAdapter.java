@@ -47,13 +47,11 @@ public class PhotoFiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return itemsCount;
     }
 
-    public static class PhotoFilterViewHolder extends RecyclerView.ViewHolder
-    {
+    public static class PhotoFilterViewHolder extends RecyclerView.ViewHolder {
 
-        public PhotoFilterViewHolder(View view)
-        {
+        public PhotoFilterViewHolder(View view) {
             super(view);
-            ButterKnife.bind(this, view);
+            ButterKnife.inject (this, view);
         }
     }
 }

@@ -47,6 +47,14 @@
                   android:screenOrientation="portrait"
                   android:theme="@style/AppTheme.TransparentActivity.FullScreen"/>
 
+        <activity
+            android:name=".Activity.PublishActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden">
+
+        </activity>
+
     </application>
 
 </manifest>

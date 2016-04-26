@@ -55,7 +55,7 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
     @InjectView(R.id.vRevealBackground)
     RevealBackgroundView vRevealBackground;
     @InjectView(R.id.vPhotoRoot)
-    View vPhotoRoot;
+    View vTakePhotoRoot;
     @InjectView(R.id.vShutter)
     View vShutter;
     @InjectView(R.id.ivTakenPhoto)
@@ -64,8 +64,6 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
     ViewSwitcher vUpperPanel;
     @InjectView(R.id.vLowerPanel)
     ViewSwitcher vLowerPanel;
-    @InjectView(R.id.vPhotoRoot)
-    View vTakePhotoRoot;
     @InjectView(R.id.cameraView)
     CameraView cameraView;
     @InjectView(R.id.rvFilters)
@@ -78,7 +76,7 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
 
     public static void startCameraFromLocation(int[] startingLocation, Activity startingActivity)
     {
-        Intent intent = new Intent(startingActivity, TakePhotoActivity.this);
+        Intent intent = new Intent(startingActivity, TakePhotoActivity.class);
         intent.putExtra(ARG_REVEAL_START_LOCATION, startingLocation);
         startingActivity.startActivity(intent);
     }
@@ -173,7 +171,7 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
         alphaInAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
 
         ObjectAnimator alphaOutAnim = ObjectAnimator.ofFloat(vShutter, "alpha", 0.8f, 0f);
-        alphaOutAnim.setDuration(100);
+        alphaOutAnim.setDuration(200);
         alphaOutAnim.setInterpolator(DECELERATE_INTERPOLATOR);
 
         AnimatorSet animatorSet = new AnimatorSet();
@@ -197,7 +195,10 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
         if (RevealBackgroundView.STATE_FINISH == state)
         {
             vTakePhotoRoot.setVisibility (View.VISIBLE);
-            startIntroAnimation ();
+            if (pendingIntro)
+            {
+                startIntroAnimation ();
+            }
         }else
         {
             vTakePhotoRoot.setVisibility (View.INVISIBLE);
@@ -206,8 +207,8 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
 
     private void startIntroAnimation()
     {
-        vUpperPanel.animate ().translationX (0).setDuration (400).setInterpolator (DECELERATE_INTERPOLATOR);
-        vLowerPanel.animate ().translationX (0).setDuration (400).setInterpolator (DECELERATE_INTERPOLATOR).start ();
+        vUpperPanel.animate ().translationY (0).setDuration (400).setInterpolator (DECELERATE_INTERPOLATOR);
+        vLowerPanel.animate ().translationY (0).setDuration (400).setInterpolator (DECELERATE_INTERPOLATOR).start ();
     }
 
 
