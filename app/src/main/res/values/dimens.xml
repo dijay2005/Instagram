@@ -14,4 +14,6 @@
 
     <dimen name="global_menu_avatar_size">64dp</dimen>
 
+    <dimen name="publish_photo_thumbnail_size">96dp</dimen>
+
 </resources>
