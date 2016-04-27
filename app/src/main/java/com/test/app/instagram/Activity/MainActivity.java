@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -23,6 +24,8 @@ import butterknife.OnClick;
 public class MainActivity extends BaseActivity implements FeedAdapter
         .OnFeedItemClickListener,FeedContextMenu.OnFeedContextMenuItemClickListener
 {
+    public static final String ACTION_SHOW_LOADING_ITEM = "action_show_loading_item";
+
     private static final int ANIM_DURATION_TOOLBAR = 300;
     private static final int ANIM_DURATION_FAB = 400;
 
@@ -75,6 +78,30 @@ public class MainActivity extends BaseActivity implements FeedAdapter
             }
         });
 
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        if (ACTION_SHOW_LOADING_ITEM.equals(intent.getAction()))
+        {
+            showFeedLoadingItemDelayed();
+        }
+    }
+
+    private void showFeedLoadingItemDelayed()
+    {
+        new Handler().postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                rvFeed.smoothScrollToPosition(0);
+                feedAdapter.showLoadingView();
+            }
+        },500);
 
     }
 
